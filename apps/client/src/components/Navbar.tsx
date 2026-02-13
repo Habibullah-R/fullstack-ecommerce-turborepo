@@ -11,8 +11,14 @@ import {
   SignInButton,
 } from "@clerk/nextjs";
 import ProfileButton from "./ProfileButton";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null; 
   return (
     <nav className="w-full flex items-center justify-between border-b border-gray-200 pb-4">
       {/* LEFT */}
