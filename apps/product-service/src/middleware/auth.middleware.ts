@@ -26,7 +26,7 @@ export const shouldBeAdmin = (req:Request,res:Response,next:NextFunction)=>{
     }
     const claims = auth.sessionClaims as CustomJwtSessionClaims
     if(claims.metadata?.role !== "admin"){
-        return res.status(401).json({'message':'Unauthorized'})
+        return res.status(403).json({'message':'Unauthorized'})
     }
     req.userId = auth.userId
     return next()
