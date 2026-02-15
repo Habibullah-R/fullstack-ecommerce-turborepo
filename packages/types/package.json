@@ -4,11 +4,15 @@
     "main": "src/index.ts",
     "version": "0.0.1",
     "scripts": {
-        "check-types": "tsx --noEmit"
+        "check-types": "tsc --noEmit"
     },
     "devDependencies": {
         "@repo/typescript-config": "*",
         "@types/node": "^25.2.3"
+    },
+    "dependencies": {
+        "@repo/product-db": "*",
+        "zod": "^4.3.6"
     },
     "exports": {
         ".": {
