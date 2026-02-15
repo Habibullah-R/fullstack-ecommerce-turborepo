@@ -10,6 +10,7 @@ export const connectOrderDb = async ()=>{
     try {
         await mongoose.connect(process.env.MONGO_URL);
         isConnected = true
+        console.log("Connected to mongodb")
     } catch (error:any) {
         console.log(error.message)
     }

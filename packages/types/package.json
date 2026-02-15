@@ -1,0 +1,19 @@
+{
+    "name": "@repo/types",
+    "type": "module",
+    "main": "src/index.ts",
+    "version": "0.0.1",
+    "scripts": {
+        "check-types": "tsx --noEmit"
+    },
+    "devDependencies": {
+        "@repo/typescript-config": "*",
+        "@types/node": "^25.2.3"
+    },
+    "exports": {
+        ".": {
+            "import": "./src/index.ts",
+            "types": "./src/index.ts"
+        }
+    }
+}
