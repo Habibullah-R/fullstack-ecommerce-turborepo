@@ -31,6 +31,7 @@ const ShippingForm = ({setShippingForm}:{setShippingForm:(data:ShippingFormInput
           id="name"
           placeholder="John Doe"
           {...register("name")}
+          value={"asd"}
         />
         {errors.name && (
           <p className="text-xs text-red-500">{errors.name.message}</p>
@@ -46,6 +47,7 @@ const ShippingForm = ({setShippingForm}:{setShippingForm:(data:ShippingFormInput
           id="email"
           placeholder="johndoe@gmail.com"
           {...register("email")}
+          value={"test@gmail.com"}
         />
         {errors.email && (
           <p className="text-xs text-red-500">{errors.email.message}</p>
@@ -61,6 +63,7 @@ const ShippingForm = ({setShippingForm}:{setShippingForm:(data:ShippingFormInput
           id="phone"
           placeholder="123456789"
           {...register("phone")}
+          value={"1231231"}
         />
         {errors.phone && (
           <p className="text-xs text-red-500">{errors.phone.message}</p>
@@ -76,6 +79,7 @@ const ShippingForm = ({setShippingForm}:{setShippingForm:(data:ShippingFormInput
           id="address"
           placeholder="123 Main St, Anytown"
           {...register("address")}
+          value={"asda"}
         />
         {errors.address && (
           <p className="text-xs text-red-500">{errors.address.message}</p>
@@ -91,6 +95,7 @@ const ShippingForm = ({setShippingForm}:{setShippingForm:(data:ShippingFormInput
           id="city"
           placeholder="New York"
           {...register("city")}
+          value={"asdas"}
         />
         {errors.city && (
           <p className="text-xs text-red-500">{errors.city.message}</p>

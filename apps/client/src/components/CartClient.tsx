@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import ShippingForm from "./ShippingForm";
 import useCartStore from "@/store/cartStore";
+import StripePaymentForm from "./StripePaymentForm";
 
 const steps = [
   {
@@ -111,7 +112,7 @@ const CartClient = () => {
           ) : activeStep === 2 ? (
             <ShippingForm setShippingForm={setShippingForm}/>
           ) : activeStep === 3 && shippingForm ? (
-            "TODO:ADD payment form"
+            <StripePaymentForm />
           ) : (
             <p className="text-sm text-gray-500">
               Please fill in the shipping form to continue.
