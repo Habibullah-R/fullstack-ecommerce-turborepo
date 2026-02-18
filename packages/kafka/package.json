@@ -1,0 +1,15 @@
+{
+    "name": "@repo/kafka",
+    "version": "0.0.1",
+    "main": "./src/index.ts",
+    "type": "module",
+    "devDependencies": {
+        "@repo/typescript-config": "*"
+    },
+    "scripts": {
+        "check-types": "tsc --noEmit"
+    },
+    "dependencies": {
+        "kafkajs": "^2.2.4"
+    }
+}
