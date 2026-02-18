@@ -3,19 +3,26 @@ import { clerkPlugin, getAuth } from "@clerk/fastify";
 import { shouldBeUser } from "./middleware/auth.middleware.js";
 import { orderRoute } from "./routes/order.js";
 import { connectOrderDb } from "@repo/order-db";
+import { consumer, producer } from "./utils/kafka.js";
 
 const fastify = Fastify();
 const PORT = 8001;
 fastify.register(clerkPlugin);
-fastify.register(orderRoute)
+fastify.register(orderRoute);
 
 fastify.get("/test", { preHandler: shouldBeUser }, (req, reply) => {
-  return reply.status(200).send({ message: "Order service authenticated",userId:req.userId });
+  return reply
+    .status(200)
+    .send({ message: "Order service authenticated", userId: req.userId });
 });
 
 const start = async () => {
   try {
-    await connectOrderDb()
+    Promise.all([
+      await connectOrderDb(),
+      await producer.connect,
+      await consumer.connect,
+    ]);
     await fastify.listen({ port: PORT });
     console.log(`Order service listening on port ${PORT}`);
   } catch (err) {

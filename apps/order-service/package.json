@@ -14,7 +14,8 @@
   "dependencies": {
     "@clerk/fastify": "^2.6.21",
     "@repo/order-db": "*",
-    "fastify": "^5.7.4"
+    "fastify": "^5.7.4",
+    "@repo/kafka":"*"
   },
   "devDependencies": {
     "@repo/types": "*",
