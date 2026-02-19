@@ -40,7 +40,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 const start = async () => {
   try {
-    Promise.all([await producer.connect, await consumer.connect]);
+    Promise.all([await producer.connect(), await consumer.connect()]);
     app.listen(PORT, () => {
       console.log(`Product service listening on port ${PORT}`);
     });

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import Stripe from "stripe";
-import stripe from "../utils/stripe;
+import stripe from "../utils/stripe";
 
 const webhookRoute = new Hono()
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string

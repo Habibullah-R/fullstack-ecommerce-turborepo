@@ -20,8 +20,8 @@ const start = async () => {
   try {
     Promise.all([
       await connectOrderDb(),
-      await producer.connect,
-      await consumer.connect,
+      await producer.connect(),
+      await consumer.connect(),
     ]);
     await fastify.listen({ port: PORT });
     console.log(`Order service listening on port ${PORT}`);
