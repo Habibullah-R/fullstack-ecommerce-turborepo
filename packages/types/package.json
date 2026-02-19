@@ -12,7 +12,8 @@
     },
     "dependencies": {
         "@repo/product-db": "*",
-        "zod": "^4.3.6"
+        "zod": "^4.3.6",
+        "@repo/order-db":"*"
     },
     "exports": {
         ".": {

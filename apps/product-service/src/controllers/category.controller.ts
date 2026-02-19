@@ -4,6 +4,7 @@ import {prisma} from "@repo/product-db";
 
 export const createCategory = async (req: Request, res: Response) => {
   const data: Prisma.CategoryCreateInput = req.body;
+  console.log(data)
   const category = await prisma.category.create({ data });
   return res.status(201).json(category);
 };

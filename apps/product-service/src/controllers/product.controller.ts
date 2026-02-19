@@ -57,7 +57,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
 export const getProducts = async (req: Request, res: Response) => {
   const { search, sort, category, limit } = req.query;
-
+  console.log("get")
   const orderBy = (() => {
     switch (sort) {
       case "asc":

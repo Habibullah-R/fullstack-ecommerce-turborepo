@@ -9,7 +9,7 @@ const Homepage = async ({searchParams}:{searchParams:Promise<{category:string}>}
       <div className="relative aspect-3/1 mb-12">
         <Image src="/featured.png" alt="featured image" fill/>
       </div>
-      <ProductList category={category} params='HomePage'/>
+      <ProductList category={category} params='homepage'/>
     </div>
   )
 }

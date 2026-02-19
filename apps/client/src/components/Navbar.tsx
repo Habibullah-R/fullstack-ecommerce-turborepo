@@ -11,7 +11,7 @@ import {
   SignInButton,
 } from "@clerk/nextjs";
 import ProfileButton from "./ProfileButton";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const Navbar = () => {
   const [mounted, setMounted] = useState(false);
@@ -36,7 +36,9 @@ const Navbar = () => {
       </Link>
       {/* RIGHT */}
       <div className="flex items-center gap-6">
-        <SearchBar />
+        <Suspense>
+          <SearchBar />
+        </Suspense>
         <Link href="/">
           <Home className="w-4 h-4 text-gray-600" />
         </Link>

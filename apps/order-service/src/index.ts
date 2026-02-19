@@ -4,8 +4,9 @@ import { shouldBeUser } from "./middleware/auth.middleware.js";
 import { orderRoute } from "./routes/order.js";
 import { connectOrderDb } from "@repo/order-db";
 import { consumer, producer } from "./utils/kafka.js";
+import { runKafkaSubscriptions } from "./utils/subscriptions.js";
 
-const fastify = Fastify();
+const fastify = Fastify(); 
 const PORT = 8001;
 fastify.register(clerkPlugin);
 fastify.register(orderRoute);
@@ -23,6 +24,7 @@ const start = async () => {
       await producer.connect(),
       await consumer.connect(),
     ]);
+    await runKafkaSubscriptions()
     await fastify.listen({ port: PORT });
     console.log(`Order service listening on port ${PORT}`);
   } catch (err) {
