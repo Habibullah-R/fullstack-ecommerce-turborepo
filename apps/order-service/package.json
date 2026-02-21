@@ -13,9 +13,10 @@
   "type": "module",
   "dependencies": {
     "@clerk/fastify": "^2.6.21",
+    "@repo/kafka": "*",
     "@repo/order-db": "*",
-    "fastify": "^5.7.4",
-    "@repo/kafka":"*"
+    "date-fns": "^4.1.0",
+    "fastify": "^5.7.4"
   },
   "devDependencies": {
     "@repo/types": "*",
