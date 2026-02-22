@@ -1,9 +1,11 @@
 import AppSidebar from "@/components/AppSidebar";
 import Navbar from "@/components/Navbar";
+import QueryProvider from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { cookies } from "next/headers";
 import { Suspense } from "react";
+import { ToastContainer} from "react-toastify"
 
 
 export default async function RootLayout({
@@ -14,6 +16,7 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
   return (
+    <QueryProvider>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -30,5 +33,7 @@ export default async function RootLayout({
             </main>
           </SidebarProvider>
         </ThemeProvider>
+      <ToastContainer position="bottom-right"/>
+        </QueryProvider>
   );
 }

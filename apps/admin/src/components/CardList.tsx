@@ -14,7 +14,7 @@ const CardList = async ({ title }: { title: string }) => {
 
   if (title === "Popular Products") {
     products = await fetch(
-      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/product?limit=5&popular=true`
+      `${process.env.NEXT_PUBLIC_PRODUCT_SERVICE_URL}/products?limit=5&popular=true`
     ).then((res) => res.json());
   } else {
     orders = await fetch(

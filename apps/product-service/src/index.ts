@@ -28,8 +28,8 @@ app.get("/", () => {
   console.log("hello");
 });
 
-app.use("/product", productRouter);
-app.use("/category", categoryRouter);
+app.use("/products", productRouter);
+app.use("/categories", categoryRouter);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(err);
