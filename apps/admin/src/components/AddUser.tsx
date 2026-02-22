@@ -12,36 +12,100 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
-
-const formSchema = z.object({
-  fullName: z
-    .string()
-    .min(2, { message: "Full name must be at least 2 characters!" })
-    .max(50),
-  email: z.email({ message: "Invalid email address!" }),
-  phone: z.string().min(10).max(15),
-  address: z.string().min(2),
-  city: z.string().min(2),
-});
+import { UserFormSchema } from "@repo/types";
+import { toast } from "react-toastify";
+import { useAuth } from "@clerk/nextjs";
+import { useMutation } from "@tanstack/react-query";
 
 const AddUser = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof UserFormSchema>>({
+    resolver: zodResolver(UserFormSchema),
+  });
+
+  const { getToken } = useAuth();
+  const mutation = useMutation({
+    mutationFn: async (data: z.infer<typeof UserFormSchema>) => {
+      const token = await getToken();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_AUTH_SERVICE_URL}/users`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!res.ok) {
+        throw new Error("Failed to create new user");
+      }
+    },
+    onSuccess: () => {
+      toast.success("user added successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
   return (
     <SheetContent>
       <SheetHeader>
         <SheetTitle className="">Add User</SheetTitle>
         <SheetDescription asChild>
-          <form>
+          <form onSubmit={form.handleSubmit((data)=>mutation.mutate(data))}>
             <FieldGroup>
               <Controller
-                name="fullName"
+                name="firstName"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-rhf-demo-title">
-                      Full Name
+                      First Name
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="form-rhf-demo-title"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter first name"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="lastName"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="form-rhf-demo-title">
+                      Last Name
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="form-rhf-demo-title"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter last name"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="username"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="form-rhf-demo-title">
+                      User Name
                     </FieldLabel>
                     <Input
                       {...field}
@@ -57,17 +121,26 @@ const AddUser = () => {
                 )}
               />
               <Controller
-                name="email"
+                name="emailAddress"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-rhf-demo-title">Email</FieldLabel>
+                    <FieldLabel htmlFor="form-rhf-demo-title">
+                      Email Addresses
+                    </FieldLabel>
                     <Input
                       {...field}
                       id="form-rhf-demo-title"
                       aria-invalid={fieldState.invalid}
-                      placeholder="Enter email"
+                      placeholder="test1@gmail.com test2@gmail.com"
                       autoComplete="off"
+                      onChange={(e) => {
+                        const emails = e.target.value
+                          .split(",")
+                          .map((item) => item.trim())
+                          .filter((email) => email);
+                        field.onChange(emails);
+                      }}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -76,18 +149,19 @@ const AddUser = () => {
                 )}
               />
               <Controller
-                name="phone"
+                name="password"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-rhf-demo-title">
-                      Phone #
+                      Password
                     </FieldLabel>
                     <Input
+                      type="password"
                       {...field}
                       id="form-rhf-demo-title"
                       aria-invalid={fieldState.invalid}
-                      placeholder="Enter phone number"
+                      placeholder="Enter password"
                       autoComplete="off"
                     />
                     {fieldState.invalid && (
@@ -96,52 +170,15 @@ const AddUser = () => {
                   </Field>
                 )}
               />
-              <Controller
-                name="address"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-rhf-demo-title">
-                      Address
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id="form-rhf-demo-title"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Enter location"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="city"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-rhf-demo-title">
-                      City
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id="form-rhf-demo-title"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Enter location"
-                      autoComplete="off"
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              
             </FieldGroup>
-            
-            <Button type="submit" className="mt-4">Submit</Button>
+
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="disabled:opacity-50 mt-5 disabled:cursor-not-allowed"
+            >
+              {mutation.isPending ? "Submitting..." : "Submit"}
+            </Button>
           </form>
         </SheetDescription>
       </SheetHeader>
