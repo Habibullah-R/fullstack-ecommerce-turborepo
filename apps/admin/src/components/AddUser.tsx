@@ -20,6 +20,13 @@ import { useMutation } from "@tanstack/react-query";
 const AddUser = () => {
   const form = useForm<z.infer<typeof UserFormSchema>>({
     resolver: zodResolver(UserFormSchema),
+    defaultValues:{
+      firstName:"",
+      lastName:"",
+      username:"",
+      emailAddress:[],
+      password:""
+    }
   });
 
   const { getToken } = useAuth();
