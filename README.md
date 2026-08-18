@@ -1,135 +1,139 @@
-# Turborepo starter
+# Fullstack E-Commerce Turborepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+A highly scalable, microservices-based fullstack e-commerce application. Built from the ground up using **Turborepo** to manage multiple applications and shared packages within a single monorepo.
 
-## Using this example
+This project features separate frontend applications for customers and administrators, and discrete backend microservices for authentication, products, orders, and payments. It utilizes an event-driven architecture with **Apache Kafka** for asynchronous communication between the services.
 
-Run the following command:
+## 🏗 Architecture
 
-```sh
-npx create-turbo@latest
+The repository is structured as a monorepo using **Turborepo** and npm workspaces.
+
+### Apps
+
+- **`client`** (Next.js 16)
+  The main customer-facing storefront. Features a responsive UI built with Tailwind CSS, state management with Zustand, form handling with React Hook Form + Zod, authentication via Clerk, and payment integration with Stripe.
+- **`admin`** (Next.js 16)
+  The administrator dashboard for managing products, viewing orders, and tracking metrics. Built with Tailwind CSS, React Hook Form, Recharts, and Clerk for secure access.
+- **`auth-service`** (Express)
+  Handles authentication flows, user synchronization via Clerk webhooks, and publishes user-related events to Kafka.
+- **`product-service`** (Express)
+  Manages the product catalog. Uses a PostgreSQL database via Prisma ORM and communicates over Kafka to handle cross-service data consistency.
+- **`order-service`** (Fastify)
+  Manages customer orders and cart checkouts. Uses a MongoDB database via Mongoose and listens to payment/product events via Kafka.
+- **`payment-service`** (Hono)
+  Handles payment processing via Stripe webhooks. Uses Hono on a Node server and publishes payment success/failure events to Kafka.
+
+### Packages (Shared Libraries)
+
+- **`@repo/kafka`**: Shared KafkaJS producer, consumer, and client configurations for event-driven communication.
+- **`@repo/product-db`**: Shared Prisma schema, migrations, and database client for PostgreSQL (used by `product-service` and potentially others).
+- **`@repo/order-db`**: Shared Mongoose connection setup and models for MongoDB (used by `order-service`).
+- **`@repo/types`**: Shared TypeScript definitions, interfaces, and Zod validation schemas used across the monorepo.
+- **`@repo/eslint-config`**: Shared ESLint configurations including Next.js and Prettier rules.
+- **`@repo/typescript-config`**: Shared `tsconfig.json` base configurations.
+
+## 📨 Event-Driven Architecture (Kafka)
+
+Kafka is used as the central message broker to ensure asynchronous communication and data consistency across the backend microservices. The `@repo/kafka` package provides shared producer and consumer utilities.
+
+### Event Flow
+
+| Publisher Service | Event Topic | Consumer Service(s) | Description |
+| :--- | :--- | :--- | :--- |
+| **`product-service`** | `product.created` | `payment-service` | Published when a new product is added. The `payment-service` listens to this event to create a corresponding product in Stripe. |
+| **`product-service`** | `product.deleted` | `payment-service` | Published when a product is deleted. The `payment-service` listens to this to remove the product from Stripe. |
+| **`payment-service`** | `payment.successful` | `order-service` | Published when a Stripe webhook confirms a successful payment checkout. The `order-service` consumes this event to finalize and create the order in the database. |
+
+## 🚀 Tech Stack
+
+- **Frontend**: Next.js 16, React 19, Tailwind CSS, Zustand, React Query, Recharts
+- **Backend**: Express, Fastify, Hono, Node.js
+- **Databases**: PostgreSQL (via Prisma), MongoDB (via Mongoose)
+- **Message Broker**: Apache Kafka (via KafkaJS)
+- **Authentication**: Clerk (Next.js & Backend integrations)
+- **Payments**: Stripe (React Stripe.js & Node SDK)
+- **Monorepo Tools**: Turborepo, npm workspaces
+- **Language**: TypeScript (100% Type Safe)
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- Node.js (v18 or higher)
+- npm (v11+)
+- PostgreSQL (running locally or remote)
+- MongoDB (running locally or remote)
+- Apache Kafka (running locally via Docker or a managed service like Confluent)
+- Clerk Account (for authentication keys)
+- Stripe Account (for payment keys)
+
+## 🛠 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd fullstack-ecommerce-turborepo
 ```
 
-## What's inside?
+### 2. Install dependencies
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+npm install
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 3. Environment Variables
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+You must create `.env` files in the respective service directories. Refer to the codebase for the exact variable names required.
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+- **`apps/client/.env`**: Requires Next.js specific public Clerk keys and Stripe public key.
+- **`apps/admin/.env`**: Requires Next.js specific public Clerk keys.
+- **`apps/auth-service/.env`**: Requires Clerk Secret Key and Kafka broker URL.
+- **`apps/product-service/.env`**: Requires Database URL for PostgreSQL, Clerk keys, and Kafka broker URL.
+- **`apps/order-service/.env`**: Requires MongoDB URI, Clerk keys, and Kafka broker URL.
+- **`apps/payment-service/.env`**: Requires Stripe Secret Key, Stripe Webhook Secret, Clerk keys, and Kafka broker URL.
+- **`packages/product-db/.env`**: Requires `DATABASE_URL` to run Prisma migrations.
+- **`packages/order-db/.env`**: Requires MongoDB connection string.
 
-### Develop
+### 4. Database Setup
 
-To develop all apps and packages, run the following command:
+**PostgreSQL Setup (Product Service):**
 
-```
-cd my-turborepo
+Navigate to the `product-db` package to set up the database schema:
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+cd packages/product-db
+# Generate Prisma Client
+npm run db:generate
+# Run migrations to update your local database schema
+npm run db:migrate
 ```
 
-### Remote Caching
+### 5. Start Development Servers
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Run the following command from the root of the project to start all applications and backend services simultaneously using Turborepo's pipeline:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+npm run dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Alternatively, you can run services individually using filters:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+```bash
+npx turbo run dev --filter=client
+npx turbo run dev --filter=product-service
 ```
 
-## Useful Links
+### Default Ports (Check specific app configuration)
+- **Client App**: `http://localhost:3002`
+- **Admin App**: `http://localhost:3003`
 
-Learn more about the power of Turborepo:
+## 📦 Available Scripts (Root)
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+Run these commands from the root directory:
+
+- `npm run build`: Build all apps and packages for production.
+- `npm run dev`: Start all apps and packages in development mode with hot-reloading.
+- `npm run lint`: Run ESLint across all apps and packages.
+- `npm run format`: Format all supported files using Prettier.
+- `npm run check-types`: Run TypeScript compiler (`tsc --noEmit`) to check for type errors across the monorepo.
